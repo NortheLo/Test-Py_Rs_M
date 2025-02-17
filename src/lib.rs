@@ -37,11 +37,11 @@ pub fn write_bin(path: String, hdr: Header) -> Result<i32, std::io::Error> {
 
 #[pyfunction]
 pub fn read_bin(path: String) -> Result<Header, std::io::Error> {
-    let mut f = File::open(path).map_err(|e| e.into())?;
+    let mut f = File::open(path)?;
     let mut buffer = Vec::new();
     
     // Read entire file into buffer
-    f.read_to_end(&mut buffer).map_err(|e| e.into())?;
+    f.read_to_end(&mut buffer)?;
 
     // Ensure file has at least 4 bytes (for counter)
     if buffer.len() < 4 {
@@ -72,6 +72,7 @@ fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 pub fn bin_fil(module: &Bound<'_, PyModule>) -> Result<(), pyo3::PyErr> {
     module.add_class::<Header>()?;
     module.add_function(wrap_pyfunction!(write_bin, module)?)?;
+    module.add_function(wrap_pyfunction!(read_bin, module)?)?;
     module.add_function(wrap_pyfunction!(sum_as_string, module)?)?;
 
     Ok(())
